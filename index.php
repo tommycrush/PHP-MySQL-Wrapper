@@ -2,10 +2,16 @@
 
 class MySQL {
 	
-	private $conn;
+	private $conn = null;
+	private $error_level = 1;//default to die on error, with detailed message
 	
 	
-	public function __construct($host, $username, $password, $db = null){
+	public function __construct($host, $username, $password, $db = null, $error_level = null){
+		
+		//check, before anything, if they are setting the error level
+		if(is_numeric($error_level)){
+			$this->setErrorLevel($error_level);
+		}
 		
 		//create connection
 		$this->conn = mysql_connect($host, $username, $password);
@@ -13,12 +19,13 @@ class MySQL {
 			$this->error("Failure on connection.");
 		}
 		
-		//if a database was passed:
+		//if a database was passed, then select it
 		if($db !== null){
 			$this->db_connect($db);
 		}
 		
 	}
+	
 	
 	
 	/*
@@ -48,10 +55,7 @@ class MySQL {
 	public function insertAndReturnID($sql){
 		$this->query($sql);
 		return @mysql_insert_id($this->conn);
-	}
-
-
-	
+	}	
 	
 	
 	
@@ -60,6 +64,7 @@ class MySQL {
 	 * 		query
 	 * 		fetch_array
 	 * 		num_rows
+	 * 		escape
 	 */ 
 	
 	
@@ -88,12 +93,48 @@ class MySQL {
 	}
 	
 	
+	/*
+	 * return an escaped (safe) text string, given a raw string
+	 */
+	
 	public function escape($text){
-		return mysql_real_escape_string($text, $this->conn);
+		return @mysql_real_escape_string($text, $this->conn);
 	}
 	
+	
+	
+	/*
+	 * handles the error function
+	 */ 
+	public function error($msg){
+		switch($this->error_level){
+			case 1:
+				die($msg." [".mysql_error($this->conn)."]");
+			break;
+			
+			case 2: 
+				die($msg);
+			break;
+			
+			case 3:
+				die();
+			break;
+		}
+	}
+	
+	
+	/*
+	 * sets the error level [1 = die with all mesage data, 2 = die with basic message, 3 = die with no message, 4 = continue];
+	 */ 
+	public function setErrorLevel($level){
+		$this->error_level = $level;	
+	}
+	
+	/*
+	 * will close the connection
+	 */
 	public function __destruct(){
-		@mysql_close();
+		@mysql_close($this->conn);
 	}
 	
 }
