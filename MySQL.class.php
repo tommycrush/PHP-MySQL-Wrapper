@@ -77,7 +77,7 @@ class MySQL_Wrapper {
 	 */ 
 	public function insertAndReturnID($sql){
 		$this->query($sql);
-		return @mysql_insert_id($this->conn);
+		return $this->insert_id();
 	}	
 	
 	
@@ -89,7 +89,6 @@ class MySQL_Wrapper {
 	 * 		num_rows
 	 * 		escape
 	 */ 
-	
 	
 	
 	
@@ -113,6 +112,13 @@ class MySQL_Wrapper {
 	 */
 	public function num_rows($resource){
 		return @mysql_num_rows($resource);
+	}
+	
+	/*
+	 * return the last insert_id
+	 */ 
+	public function insert_id(){
+		return @mysql_insert_id($this->conn);
 	}
 	
 	
