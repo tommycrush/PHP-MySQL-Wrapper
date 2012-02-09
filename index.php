@@ -7,6 +7,8 @@ require("MySQL.class.php");
 $db = new MySQL_Wrapper("localhost", "root", "root", "test_database");
 
 
+
+
 $id = $db->insertAndReturnID("INSERT INTO `users` (`email`,`first_name`,`last_name`) VALUES ('email','fist','name') ");
 
 
@@ -23,6 +25,11 @@ foreach($db->getMultipleRows("SELECT * FROM `users`") as $row){
 
 
 echo "loaded $id";
+
+$test = $db->smartInsert("users", array('email','first_name','last_name'), array(array('me@tommy.com','firstest','best'),array('2nd email','blah','crush')));
+echo $test;
+
+
 
 /*
 //connection example for MySQLi
