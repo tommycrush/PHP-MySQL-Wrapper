@@ -5,7 +5,9 @@ class MySQLi_Wrapper {
 	private $conn = null;
 	private $error_level = 1;//default to die on error, with detailed message
 	
-	
+	/*
+	 * call on object construction
+	 */ 	
 	public function __construct($host, $username, $password, $database = null, $error_level = null){
 		
 		//check, before anything, if they are setting a custom error level
@@ -24,6 +26,19 @@ class MySQLi_Wrapper {
 	}	
 	
 	/*
+	 * call on object destruction
+	 * 		closes the connection to the database
+	 */
+	public function __destruct(){
+		if($this->conn){
+			@mysqli_close($this->conn);
+		}
+		return;
+	}
+	
+
+
+	/*
  	*  connects to the server, given the required params
 	 * saves the connection in the object variable of "conn"
  	*/ 	
@@ -35,6 +50,10 @@ class MySQLi_Wrapper {
 			$this->error("Failure on connection.");
 		}
 	}
+
+
+
+
 	
 	/*
 	 * connects to a database, given the name of the database
@@ -45,6 +64,77 @@ class MySQLi_Wrapper {
 	
 	
 	
+	/*
+	 * BEGIN CORE FUNCTIONS: [these will be used internally and can/will be used externally as well]
+	 * 		query
+	 * 		fetch_array
+	 * 		num_rows
+	 * 		insert_id
+	 * 		escape
+	 */ 
+	 
+
+	/*
+	 * returns an executed query resource, given the SQL
+	 */
+	public function query($sql){
+		$result = mysqli_query($this->conn, $sql) or $this->error("Failure on query");
+		return $result;
+	}
+	
+	/*
+	 * returns an array of the data, given a resource
+	 */  	
+	public function fetch_array($resource){
+		return @mysqli_fetch_array($resource);
+	}
+	
+	/*
+	 * return the number of rows, given a resource
+	 */
+	public function num_rows($resource){
+		return @mysql_num_rows($resource);
+	}
+	
+	
+	/*
+	 * return an escaped (safe) text string, given a raw string
+	 */
+	
+	public function escape($text){
+		return @mysqli_real_escape_string($this->conn, $text);
+	}
+
+
+	/*
+	 * return the last insert_id
+	 */ 
+	public function insert_id(){
+		return @mysqli_insert_id($this->conn);
+	}
+	
+	/*
+	 * END CORE FUNCTIONS
+	 */ 
+
+
+
+
+
+
+
+
+
+
+	/*
+	 * BEGIN 'unneccesary' FUNCTIONS [go beyond simple implementation, used only externally]
+	 * 		getOneRow
+	 * 		getMultipleRows
+	 * 		insertAndReturnID
+	 * 		
+	 */ 
+
+
 	/*
 	 * Queries and returns an array of the extracted data
 	 */ 
@@ -82,53 +172,24 @@ class MySQLi_Wrapper {
 	 */ 
 	public function insertAndReturnID($sql){
 		$this->query($sql);
-		return @mysqli_insert_id($this->conn);
+		return $this->insert_id($this->conn);
 	}	
 	
 	
-	
 	/*
-	 * CORE FUNCTIONS:
-	 * 		query
-	 * 		fetch_array
-	 * 		num_rows
-	 * 		escape
+	 * END 'unneccesary' FUNCTIONS
+	 */ 	
+	
+	
+
+	
+
+	/*
+	 * ERROR HANDLING FUNCTIONS:
+	 * 		error
+	 * 		setErrorLevel
 	 */ 
-	
-	
-	
-	
-	/*
-	 * returns an executed query resource, given the SQL
-	 */
-	public function query($sql){
-		$result = mysqli_query($this->conn, $sql) or $this->error("Failure on query");
-		return $result;
-	}
-	
-	/*
-	 * returns an array of the data, given a resource
-	 */  	
-	public function fetch_array($resource){
-		return @mysqli_fetch_array($resource);
-	}
-	
-	/*
-	 * return the number of rows, given a resource
-	 */
-	public function num_rows($resource){
-		return @mysql_num_rows($resource);
-	}
-	
-	
-	/*
-	 * return an escaped (safe) text string, given a raw string
-	 */
-	
-	public function escape($text){
-		return @mysqli_real_escape_string($this->conn, $text);
-	}
-	
+		
 	
 	
 	/*
@@ -157,14 +218,12 @@ class MySQLi_Wrapper {
 	public function setErrorLevel($level){
 		$this->error_level = $level;	
 	}
-	
+
 	/*
-	 * will close the connection
+	 * END ERROR HANDLING FUNCTIONS
+	 * 
 	 */
-	public function __destruct(){
-		@mysql_close($this->conn);
-	}
-	
+
 }
 
 
