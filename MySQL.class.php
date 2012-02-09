@@ -199,7 +199,7 @@ class MySQL_Wrapper {
 		
 		
 	
-		if(count($data) != count($data, COUNT_RECURSIVE)){
+		if(is_array(reset($data))){
 			//multidimensional, a.k.a : insert more than 1 row
 			
 			$rows = array();
