@@ -1,16 +1,34 @@
 <?php
+ini_set("display_errors",1);
+
 
 //connection example for MySQL:
 require("MySQL.class.php");
 $db = new MySQL_Wrapper("localhost", "root", "root", "test_database");
-unset($db);
 
 
+$id = $db->insertAndReturnID("INSERT INTO `users` (`email`,`first_name`,`last_name`) VALUES ('email','fist','name') ");
+
+
+$id = $db->escape($id);
+
+$test  = $db->getOneRow("SELECT * FROM `users` WHERE user_id='$id' LIMIT 1");
+echo "<br/><pre>";
+print_r($test);
+echo "</pre><br/>";
+
+foreach($db->getMultipleRows("SELECT * FROM `users`") as $row){
+	echo $row["user_id"]."<br/>";
+}
+
+
+echo "loaded $id";
+
+/*
 //connection example for MySQLi
 require('MySQLi.class.php');
 $db = new MySQLi_Wrapper("localhost", "root", "root", "test_database");
-unset($db);
-
+*/
 
 /* All wrappers contain the following functions:
  * 
@@ -39,7 +57,7 @@ unset($db);
  * 
  */
 
- 
+ /*
 //insert a new row
 $insert_id = $db->insertAndReturnID("INSERT INTO `test` (`col1`,`col2`) VALUES ('v1', 'v2')");
 
@@ -55,6 +73,8 @@ $data = $db->getOneRow("SELECT * FROM `test` WHERE `col1`='v1' LIMIT 1");
 foreach($db->getMultipleRows("SELECT * FROM `test`") as $row){
 	echo $row["col1"]."<br/>";
 }
+  * 
+  */
 
 
 
