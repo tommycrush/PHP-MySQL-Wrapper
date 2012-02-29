@@ -50,12 +50,12 @@ $new_id = $db->insertAndReturnID("INSERT INTO `users` (`email`,`first_name`,`las
 
 
 //escape data
-$id = $db->escape('tommy');
+$name = $db->escape('tommy');
 
 
 
 //if we only want 1 row of data, we can get it returned as an array to simplify things
-$data  = $db->getOneRow("SELECT * FROM `users` WHERE first_name='$id' LIMIT 1");
+$data  = $db->getOneRow("SELECT * FROM `users` WHERE first_name='$name' LIMIT 1");
 
 //lets see what we got:
 echo "<pre>";
