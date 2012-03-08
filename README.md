@@ -6,8 +6,10 @@ a wrapper written in PHP designed to:
 * makes runtime queries much more simple and organized.
 
 ###Instructions:
-1) download files, and upload MySQL or MYSQLi class file to server 
+1) download files, and upload MySQL or MYSQLi class file to server
+ 
 2) require that file
+
 3) create the object: `$db = new MySQL_Wrapper("localhost", "user", "pass", "db_name");`
 
 
