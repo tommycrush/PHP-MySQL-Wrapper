@@ -1,4 +1,5 @@
 <?php
+//for initial debugging
 ini_set("display_errors",1);
 
 
@@ -11,6 +12,8 @@ $db = new MySQL_Wrapper("localhost", "root", "root", "test_database");
 require('MySQLi.class.php');
 $db = new MySQLi_Wrapper("localhost", "root", "root", "test_database");
 */
+
+
 
 /* All wrappers contain the following functions:
  * 
@@ -53,14 +56,21 @@ $new_id = $db->insertAndReturnID("INSERT INTO `users` (`email`,`first_name`,`las
 $name = $db->escape('tommy');
 
 
-
 //if we only want 1 row of data, we can get it returned as an array to simplify things
 $data  = $db->getOneRow("SELECT * FROM `users` WHERE first_name='$name' LIMIT 1");
 
-//lets see what we got:
-echo "<pre>";
-print_r($data);
-echo "</pre>";
+if(!$data){
+	echo "No rows were found :(";
+}else{
+
+	//lets see what we got:
+	echo "<pre>";
+	print_r($data);
+	echo "</pre>";
+
+}	
+
+
 
 //lets get a lot of data returned to us in a 2D array
 foreach($db->getMultipleRows("SELECT `first_name` FROM `users`") as $row){
@@ -68,6 +78,18 @@ foreach($db->getMultipleRows("SELECT `first_name` FROM `users`") as $row){
 }
 
 
-$success = $db->smartInsert("users", array('email','first_name','last_name'), array(array('me@tommycrush.com','tommy','crush'),array('you@you.com','John','Doe')));
 
+//'Smart' Inserts:
+
+$columns =  array('email','first_name','last_name');
+$data = array(
+			array('me@tommycrush.com','tommy','crush'),
+			array('you@you.com','John','Doe')
+			);
+
+$success = $db->smartInsert("users", $columns, $data);
+
+if($success){
+	echo "Sweet!";
+}
 ?>
