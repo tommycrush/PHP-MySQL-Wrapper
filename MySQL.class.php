@@ -242,7 +242,12 @@ class MySQL_Wrapper {
 					$row_sql .= ",";
 				}
 				
-				$row_sql .= "'".$this->escape($value)."'";
+				if($value == "NOW()"){
+					$row_sql .= "NOW()";
+				}else{
+					$row_sql .= "'".$this->escape($value)."'";
+				}
+				
 					
 				$x++;
 			}
@@ -301,6 +306,10 @@ class MySQL_Wrapper {
 			
 			case 3:
 				die();
+			break;
+	
+			case 4:
+				throw new Exception($msg." [".mysql_error($this->conn)."]");
 			break;
 		}
 	}
