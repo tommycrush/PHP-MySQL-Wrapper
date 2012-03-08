@@ -27,7 +27,7 @@ while that's still useful in the sense we can now move between MySQL and MySQL, 
 if `$data` is false, then the query came up empty, else `$data` is an array of whats been returned
 
 ####getMultipleRows
-`$rows = $db->getMultipleRows("SELECT * FROM users");
+`$rows = $db->getMultipleRows("SELECT * FROM users"); \n
 if(!$rows){
 echo "No rows found!";
 }else{
