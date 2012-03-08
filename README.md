@@ -23,17 +23,20 @@ while that's still useful in the sense we can now move between MySQL and MySQL, 
 
 ####getOneRow
 `$data  = $db->getOneRow("SELECT * FROM users LIMIT 1");`
+
 if `$data` is false, then the query came up empty, else `$data` is an array of whats been returned
 
 ####getMultipleRows
-$rows = $db->getMultipleRows("SELECT * FROM users");
+`$rows = $db->getMultipleRows("SELECT * FROM users");
 if(!$rows){
 echo "No rows found!";
 }else{
 foreach($rows as $row){
 echo $row["name"];
 }
-}
+}`
+
+`$rows` is a 2D array of rows of data, or its false is nothing is returned
 
 Created by Tommy Crush
 -
