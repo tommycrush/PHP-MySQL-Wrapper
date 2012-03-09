@@ -14,25 +14,29 @@ a wrapper written in PHP designed to:
 
 
 ####Raw Query
-`$result = $db->query("SELECT * FROM users LIMIT 1");
+```php
+$result = $db->query("SELECT * FROM users LIMIT 1");
 
 if($db->num_rows($result) == 1){
 
     $data = $db->fetch_array($result);
 
-}`
+}```
 
 
 while that's still useful in the sense we can now move between MySQL and MySQL, we can make this a lot cleaner using a few extra functions:
 
 ####getOneRow
-`$data  = $db->getOneRow("SELECT * FROM users LIMIT 1");`
+```php
+$data  = $db->getOneRow("SELECT * FROM users LIMIT 1");
+`
 
 if `$data` is false, then the query came up empty, else `$data` is an array of whats been returned
 
 
 ####getMultipleRows
-`$rows = $db->getMultipleRows("SELECT * FROM users");
+```php
+$rows = $db->getMultipleRows("SELECT * FROM users");
 
 if(!$rows){
 
@@ -46,7 +50,7 @@ echo $row["name"];
 
 }
 
-}`
+}```
 
 `$rows` is a 2D array of rows of data, or its false is nothing is returned
 
