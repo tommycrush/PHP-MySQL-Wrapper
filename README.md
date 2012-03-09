@@ -13,7 +13,7 @@ a wrapper written in PHP designed to:
 3) create the object: `$db = new MySQL_Wrapper("localhost", "user", "pass", "db_name");`
 
 
-####Raw Query
+####Raw Query _not necessarily recommended_
 
 ```php
 $result = $db->query("SELECT * FROM users LIMIT 1");
