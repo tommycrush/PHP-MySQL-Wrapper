@@ -1,12 +1,44 @@
 <?php
 
+
+/**
+ * @file
+ * Definition of MySQL_Wrapper
+ *
+ * The MySQL_Wrapper is used to simplify interaction with the database.
+ * It can be interchanged with a MySQLi_Wrapper.
+ *
+ * @todo make the class a singleton
+ */
+
 class MySQL_Wrapper {
 	
+	//holds the connection [used for MySQLi]
 	private $conn = null;
-	private $error_level = 1;//default to die on error, with detailed message
+
+	//holds the error level, which will be used to decide how to handle an error
+	//@see error()
+	//@see setErrorLevel()
+	private $error_level = 1;
 	
-	/*
-	 * call on object construction
+	/**
+	 * MySQL_Wrapper constructor
+	 *
+	 * establishes connection based with database on the parameteres
+	 *
+	 * @param string $host
+	 *
+	 * @param string $username
+	 *
+	 * @param string $password
+	 *
+	 * @param string $database
+	 *   (optional) if set, it will connect to a particular database
+	 *    @see connect()
+	 * 
+	 * @param int $error_level
+	 *   (optionak) if set, it will set the error level
+	 *   @see setErrorLevel() 
 	 */ 
 	public function __construct($host, $username, $password, $database = null, $error_level = null){
 		
@@ -26,9 +58,10 @@ class MySQL_Wrapper {
 		
 	}	
 	
-	/*
-	 * call on object destruction
-	 * 		closes the connection to the database
+	/**
+	 * MySQL_Wrapper destructor
+	 * 		
+	 * closes the connection to the database
 	 */
 	public function __destruct(){
 		@mysql_close($this->conn);
@@ -36,10 +69,15 @@ class MySQL_Wrapper {
 
 
 
-	/*
-	 * establishes connection to db and saved in data member conn
+	/**
+	 * Connects to the server
+	 * @param string $host
+	 *
+	 * @param string $username
+	 *
+	 * @param string $password	 
 	 */ 
-	public function connect($host, $username, $password){
+	private function connect($host, $username, $password){
 		
 		//create connection
 		$this->conn = @mysql_connect($host, $username, $password);
@@ -49,19 +87,16 @@ class MySQL_Wrapper {
 		
 	}
 	
-	/*
-	 * connects to a database, given the name of the database
+	/**
+	 * Connects to a particular databse on the existing connection
+	 * 
+	 * @param string $database_name
 	 */
 	public function db_select($database_name){
 		@mysql_select_db($database_name, $this->conn) or $this->error("Failure on db selection");
 	}
 	
-	
-	
-	
 
-	
-	
 	
 	
 	/*
@@ -74,38 +109,56 @@ class MySQL_Wrapper {
 	 */ 
 	 
 	
-	/*
-	 * returns an executed query resource, given the SQL
+	/**
+	 * queries the database
+	 *
+	 * @param string $sql
+	 *
+	 * @return mysql_resource
 	 */
 	public function query($sql){
 		$result = mysql_query($sql, $this->conn) or $this->error("Failure on Query.");
 		return $result;
 	}
 	
-	/*
-	 * returns an array of the data, given a resource
-	 */  	
+   /**
+	* fetchs an array from a mysql resource
+	*
+	* @param mysql_resource $resource
+	*
+	* @return array of the data
+	*/  	
 	public function fetch_array($resource){
 		return @mysql_fetch_array($resource);
 	}
 	
-	/*
-	 * return the number of rows, given a resource
+	/**
+	 * returns the number of rows in a resource
+	 *
+	 * @param mysql_resource $resource
+	 *
+	 * @return int $num_rows
 	 */
 	public function num_rows($resource){
 		return @mysql_num_rows($resource);
 	}
 	
-	/*
-	 * return the last insert_id
+	/**
+	 * returns the last inserted id
+	 *
+	 * @return int 
 	 */ 
 	public function insert_id(){
 		return @mysql_insert_id($this->conn);
 	}
 	
 	
-	/*
-	 * return an escaped (safe) text string, given a raw string
+	/**
+	 * escapes a string to make it safe for queries
+	 *
+	 * @param string $text
+	 *
+	 * @return string $escaped_text
 	 */
 	
 	public function escape($text){
@@ -134,8 +187,17 @@ class MySQL_Wrapper {
 	
 	
 	
-	/*
-	 * Queries and returns an array of the extracted data
+	/**
+	 * performs a query to select a single row of data
+	 *
+	 * useful for checking if a record exists
+	 *
+	 * @param string $sql
+	 *   ensure that "LIMIT 1" is used in the query
+	 *
+	 * @return array | bool
+	 *		if the row is found, it will return an array of the data
+	 *		if the row is not found, it will return false
 	 */ 
 
 	public function getOneRow($sql){
@@ -147,10 +209,15 @@ class MySQL_Wrapper {
 		}
 	}
 
-	/*
-	 * Queries and returns an array of arrays
+	/**
+	 * Performs a query and returns a 2D array of results
 	 * 
-	 * returned example : Array ( Array("name" => "Tommy", "twitter" => "ThomasTommyTom"), Array("name" => "Ruby", "twitter" => null) )
+	 * @param string @sql
+	 *
+	 * @return 2D Array | bool
+	 *		if the row is found, it will return an array containing arrays of the data
+	 *		if the row is not found, it will return false
+	 *  	example : Array ( Array("name" => "Tommy", "twitter" => "ThomasTommyTom"), Array("name" => "Ruby", "twitter" => null) )
 	 */ 
 	public function getMultipleRows($sql){
 		$result = $this->query($sql);
@@ -167,16 +234,34 @@ class MySQL_Wrapper {
 
 
 
-	/*
+	/**
 	 * Executes the SQL, then returns the insert_id of the record
+	 *
+	 * useful for single insertions
+	 * 
+	 * @param string $sql
+	 *
+	 * @return int $insert_id
 	 */ 
 	public function insertAndReturnID($sql){
 		$this->query($sql);
 		return $this->insert_id();
 	}	
 
-	/*
-	 * data passed as arguements and is escaped for safer insertion
+	/**
+	 * Performs a insertion query based on the parameters
+	 *
+	 * useful because it escapes all input for safer queries
+	 * 
+	 * @param string $table
+	 *
+	 * @param array $columns
+	 *		example: array ("name","user_id")
+	 *
+	 * @param array | 2D array $data
+	 *		example: array("tommy",1) or array(array("tommy",1),array("sean",2))
+	 *
+	 *
 	 */ 
 	public function smartInsert($table, $columns, $data){
 		//compose SQL
@@ -267,19 +352,12 @@ class MySQL_Wrapper {
 	
 
 	/*
-	 * END 'unneccesary' FUNCTIONS
+	 * END 'extras' FUNCTIONS
 	 */ 	
 	
 	
 	
-	
 
-	
-	
-	
-	
-	
-	
 	
 	
 	
@@ -291,8 +369,12 @@ class MySQL_Wrapper {
 	 */ 
 	
 	
-	/*
-	 * handles the error function
+	/**
+	 * handles the errors of the wrapper
+	 *
+	 * @param string $msg
+	 *
+	 * @see setErrorLevel()
 	 */ 
 	public function error($msg){
 		switch($this->error_level){
@@ -308,14 +390,22 @@ class MySQL_Wrapper {
 				die();
 			break;
 	
+			//implemented for jQueryMobile
 			case 4:
-				throw new Exception($msg." [".mysql_error($this->conn)."]");
+				throwError($msg." [".mysql_error($this->conn)."]");
 			break;
 		}
 	}
 	
-	/*
+	/**
 	 * sets the error level [1 = die with all mesage data, 2 = die with basic message, 3 = die with no message, 4 = continue];
+	 *
+	 * @param int $level
+	 *    1 = die with all mesage data, 
+	 *    2 = die with basic message,
+	 *    3 = die with no message
+	 *    4 = throw exception
+	 *    5 = continue without handling the error (not recommended)
 	 */ 
 	public function setErrorLevel($level){
 		$this->error_level = $level;	
@@ -327,6 +417,5 @@ class MySQL_Wrapper {
 	 */
 	
 }
-
 
 ?>
